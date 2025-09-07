@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { Server } from 'socket.io';
+import http from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -147,30 +148,62 @@ const readJsonFromFile = async (filePath) => {
 };
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-const HOST = '0.0.0.0';  // Listen on all network interfaces
 
-// Initialize Socket.io with your Express server
-const server = app.listen(PORT, HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT}`);
-  console.log(`For local network access: http://192.168.1.61:${PORT}`);
-});
+// Use environment PORT when provided (Render sets PORT). Default to 3001 locally.
+const PORT = Number(process.env.PORT) || 3001;
+const HOST = process.env.HOST || '0.0.0.0';  // Listen on all network interfaces by default
 
-const io = new Server(server, {
+// Create an explicit HTTP server so we can configure timeouts (keepAlive, headers)
+const httpServer = http.createServer(app);
+
+// Configure timeouts (values in milliseconds). These help reduce intermittent timeouts / connection resets
+const KEEP_ALIVE_TIMEOUT = Number(process.env.KEEP_ALIVE_TIMEOUT) || 120000; // 120s
+const HEADERS_TIMEOUT = Number(process.env.HEADERS_TIMEOUT) || (KEEP_ALIVE_TIMEOUT + 5000); // slightly larger than keepAlive
+
+httpServer.keepAliveTimeout = KEEP_ALIVE_TIMEOUT;
+httpServer.headersTimeout = HEADERS_TIMEOUT;
+
+// Socket.IO CORS origin - allow configuring via env for production security
+const SOCKET_IO_ORIGIN = process.env.SOCKET_IO_ORIGIN || '*';
+
+// Initialize Socket.io with the HTTP server
+const io = new Server(httpServer, {
   cors: {
-    origin: '*', // Allow connections from any origin
+    origin: SOCKET_IO_ORIGIN,
     methods: ['GET', 'POST'],
     credentials: true
   }
 });
 
+// Start listening
+httpServer.listen(PORT, HOST, () => {
+  console.log(`Server running on http://${HOST}:${PORT}`);
+  try {
+    const networkIp = Object.values(require('os').networkInterfaces())
+      .flat()
+      .filter(Boolean)
+      .find(i => i && i.family === 'IPv4' && !i.internal)?.address;
+    if (networkIp) {
+      console.log(`For local network access: http://${networkIp}:${PORT}`);
+    }
+  } catch (e) {
+    // ignore network lookup errors
+  }
+  console.log(`[SERVER] keepAliveTimeout=${httpServer.keepAliveTimeout}, headersTimeout=${httpServer.headersTimeout}`);
+});
+
 // Middleware
 app.use(cors({
-  origin: '*', // Allow connections from any origin
+  origin: SOCKET_IO_ORIGIN === '*' ? '*' : SOCKET_IO_ORIGIN,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 app.use(bodyParser.json({ limit: '10mb' }));
+
+// Health check endpoint for Render / load balancer probes
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() });
+});
 
 // Broadcast when files change
 function broadcastDataChange(fileType) {
