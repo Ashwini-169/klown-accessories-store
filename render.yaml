@@ -1,0 +1,15 @@
+# Render service configuration - deploys a web service from this repo
+services:
+  - type: web
+    name: klown-accessories-store
+    env: node
+    region: oregon
+    branch: main
+    plan: free
+    buildCommand: "npm ci && npm run build"
+    startCommand: "npm start"
+    autoDeploy: true
+    disk: 1024 # MB - increase if you store many files
+    envVars:
+      - key: NODE_ENV
+        value: production

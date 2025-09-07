@@ -1,0 +1,24 @@
+app = "klown-accessories-store"
+
+[build]
+  image = "dockerfile"
+
+[env]
+  PORT = "3001"
+
+[[services]]
+  internal_port = 3001
+  protocol = "tcp"
+  processes = ["app"]
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls"]
+    port = 443
+
+# Persistent volume note: to persist `src/data` across restarts, create a volume and mount it
+# fly volumes create klown-data --region <region>
+# then add volume_mounts section and mount to /app/src/data
