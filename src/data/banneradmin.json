@@ -1,0 +1,14 @@
+{
+  "heroBannerImage": "https://images.pexels.com/photos/8838881/pexels-photo-8838881.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "suggestedBanners": [
+    "https://images.pexels.com/photos/8838877/pexels-photo-8838877.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    "https://images.pexels.com/photos/8838881/pexels-photo-8838881.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    "https://images.pexels.com/photos/8838890/pexels-photo-8838890.jpeg?auto=compress&cs=tinysrgb&w=1200"
+  ],
+  "lastUpdated": "2025-09-07T06:11:57.429Z",
+  "settings": {
+    "overlayText": true,
+    "overlayColor": "rgba(0,0,0,0.3)",
+    "textColor": "#ffffff"
+  }
+}

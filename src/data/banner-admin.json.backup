@@ -1,0 +1,19 @@
+[
+  {
+    "id": "hero1",
+    "type": "content",
+    "title": " ",
+    "subtitle": " ",
+    "description": " ",
+    "features": [
+      {
+        "id": "feature1",
+        "icon": "Star",
+        "text": "New Feature",
+        "color": "gray"
+      }
+    ],
+    "buttonText": "Shop Collection",
+    "buttonLink": "#products"
+  }
+]

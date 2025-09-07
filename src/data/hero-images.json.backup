@@ -1,0 +1,30 @@
+[
+  {
+    "id": "heroImages",
+    "images": [
+      {
+        "id": "img1",
+        "url": "https://images.pexels.com/photos/8838877/pexels-photo-8838877.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "active": false
+      },
+      {
+        "id": "img2",
+        "url": "https://images.pexels.com/photos/8838881/pexels-photo-8838881.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "active": true
+      },
+      {
+        "id": "img3",
+        "url": "https://images.pexels.com/photos/8838890/pexels-photo-8838890.jpeg?auto=compress&cs=tinysrgb&w=1200",
+        "active": false
+      },
+      {
+        "id": "img1757233316888",
+        "url": "https://images.unsplash.com/photo-1674704740402-72b777b9aea1",
+        "active": true
+      }
+    ],
+    "autoSlideInterval": 2000,
+    "overlayOpacity": 0.2,
+    "overlayColor": "#000000"
+  }
+]
