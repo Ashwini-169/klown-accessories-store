@@ -629,6 +629,33 @@ app.post('/api/savefile', async (req, res) => {
   }
 });
 
+// Serve built frontend (Vite) from `dist` when available
+try {
+  const distPath = path.join(__dirname, 'dist');
+  if (fs.existsSync(distPath)) {
+    console.log(`[SERVER] Serving static frontend from ${distPath}`);
+    // static assets
+    app.use(express.static(distPath));
+
+    // SPA fallback for client-side routing — exclude API and socket paths
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+        return next();
+      }
+      const indexPath = path.join(distPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        next();
+      }
+    });
+  } else {
+    console.log('[SERVER] No dist folder found; static frontend will not be served');
+  }
+} catch (err) {
+  console.warn('[SERVER] Error while configuring static file serving:', err);
+}
+
 // Server is already started with Socket.IO at the top, no need to call listen again
 // Log that Socket.IO is ready
 console.log(`Socket.IO server is running and ready for real-time updates`);
